@@ -2,8 +2,10 @@ const express = require('express');
 const graphqlHTTP = require('express-graphql').graphqlHTTP;
 const { buildSchema } = require('graphql');
 const connectDB = require('./config/mongoose');
+const bcrypt = require('bcryptjs');
 
 const Employee = require('./models/Employee');
+const User = require('./models/User');
 
 connectDB();
 
@@ -24,6 +26,17 @@ app.use('/grahql', graphqlHTTP({
             experience: String!
         }
 
+        type User{
+            _id: ID!,
+            email: String!,
+            password: String,
+        }
+
+        input UserInput{
+            email: String!,
+            password: String,
+        }
+
         input EmployeeInput{
             name: String!
             age: String!
@@ -37,6 +50,7 @@ app.use('/grahql', graphqlHTTP({
 
         type RootMutation {
             createEmployee(employeeInput: EmployeeInput): Employee
+            createUser(userInput: UserInput): User
         }
 
 
@@ -67,6 +81,24 @@ app.use('/grahql', graphqlHTTP({
             }).catch(err =>{
                 console.log(err);
             });
+        },
+        createUser: (args)=>{
+            return User.findOne({email: args.userInput.email}).then(user => {
+                if(user){
+                    throw new Error('User already exists');
+                }
+                return bcrypt.hash(args.userInput.password, 10)
+            }).then(newPassword => {
+                const user = new User({
+                    email: args.userInput.email,
+                    password: newPassword
+                });
+                return user.save();
+            }).then(result => {
+                return {...result._doc,password: null, _id: result.id};
+            }).catch(err => {
+                console.log(err);
+            })
         }
     },
     graphiql: true

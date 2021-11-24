@@ -16,6 +16,10 @@ const employeeSchema = new mongoose.Schema({
     experience: {
         type: String,
         required: true
+    },
+    employer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 });
 
