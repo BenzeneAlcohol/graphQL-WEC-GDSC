@@ -19,17 +19,19 @@ app.use('/grahql', graphqlHTTP({
     schema: buildSchema(`
 
         type Employee{
-            _id: ID!,
+            _id: ID!
             name: String!
             age: String!
             salary: String!
             experience: String!
+            employer: User!
         }
 
         type User{
-            _id: ID!,
-            email: String!,
-            password: String,
+            _id: ID!
+            email: String!
+            password: String
+            createdEmployees: [Employee!]
         }
 
         input UserInput{
@@ -61,7 +63,7 @@ app.use('/grahql', graphqlHTTP({
     `),
     rootValue: {
         employees: ()=>{
-            return Employee.find().then(employees => {
+            return Employee.find().populate('employer').then(employees => {
                 return employees.map(employee => {
                     return {...employee._doc, _id: employee._doc._id.toString()};
                 })
@@ -74,11 +76,19 @@ app.use('/grahql', graphqlHTTP({
                 name: args.employeeInput.name,
                 age: args.employeeInput.age,
                 salary: args.employeeInput.salary,
-                experience: args.employeeInput.experience
+                experience: args.employeeInput.experience,
+                employer: '619dd51d2b7c03e5204a208b'
             });
             return employee.save().then(result =>{
-                return{...result._doc};
-            }).catch(err =>{
+                createdEmployee = {...result._doc, _id:result._doc._id.toString()};
+                return User.findById('619dd51d2b7c03e5204a208b');
+            }).then(user => {
+                user.createdEmployees.push(employee)
+                return user.save();
+            }).then(result => {
+                return createdEmployee;
+            })
+            .catch(err =>{
                 console.log(err);
             });
         },
