@@ -18,6 +18,12 @@ type User{
     createdEmployees: [Employee!]
 }
 
+type authData{
+    userID: ID!
+    token: String!
+    tokenExpiry: Int!
+}
+
 input UserInput{
     email: String!,
     password: String,
@@ -32,6 +38,7 @@ input EmployeeInput{
 
 type RootQuery {
     employees: [Employee!]!
+    login(email: String!, password: String!): authData
 }
 
 type RootMutation {

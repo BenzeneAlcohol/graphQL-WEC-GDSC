@@ -1,13 +1,15 @@
 const express = require('express');
 const graphqlHTTP = require('express-graphql').graphqlHTTP;
-const { buildSchema } = require('graphql');
 const connectDB = require('./config/mongoose');
 const GQLSchema = require('./graphQL/schema/index')
-const GQLResolver = require('./graphQL/resolvers/index')
+const GQLResolver = require('./graphQL/resolvers/index');
+const isAuth = require('./middleware/authentication');
 
 connectDB();
 
 const app = express();
+
+app.use(isAuth);
 
 app.get('/', (req,res)=>{
     res.send("Hello");

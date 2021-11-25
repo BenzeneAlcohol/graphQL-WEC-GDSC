@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 
 const Employee = require('../../models/Employee');
 const User = require('../../models/User');
+const jwt = require('jsonwebtoken');
 
 
 const findEmployees = employeeID => {
@@ -33,17 +34,21 @@ module.exports = {
             console.log(err);
         })
     },
-    createEmployee: (args)=>{
+    createEmployee: (args, req)=>{
+        if(!req.isAuth)
+        {
+            throw new Error('UnAuthenticated');
+        }
         const employee = new Employee({
             name: args.employeeInput.name,
             age: args.employeeInput.age,
             salary: args.employeeInput.salary,
             experience: args.employeeInput.experience,
-            employer: '619dd51d2b7c03e5204a208b'
+            employer: req.userID
         });
         return employee.save().then(result =>{
             createdEmployee = {...result._doc, _id:result._doc._id.toString()};
-            return User.findById('619dd51d2b7c03e5204a208b');
+            return User.findById(req.userID);
         }).then(user => {
             user.createdEmployees.push(employee)
             return user.save();
@@ -71,5 +76,17 @@ module.exports = {
         }).catch(err => {
             console.log(err);
         })
+    },
+    login: async ({email, password}) => {
+        const user = await User.findOne({email: email});
+        if(!user){
+            throw new Error("User doesn't exist");
+        }
+        const isEqual = await bcrypt.compare(password, user.password);
+        if(!isEqual) {
+            throw new Error('Password is incorrect');
+        }
+        const token = jwt.sign({userID: user.id, email: user.email}, 'GTNnO0OA0dWzCUdyUGuZR7x5kPWnYTp3', {expiresIn: '3h'});
+        return {userID: user.id, token: token, tokenExpiry:3}
     }
 }
