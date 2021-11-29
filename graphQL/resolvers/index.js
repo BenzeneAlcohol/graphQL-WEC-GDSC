@@ -88,5 +88,35 @@ module.exports = {
         }
         const token = jwt.sign({userID: user.id, email: user.email}, 'GTNnO0OA0dWzCUdyUGuZR7x5kPWnYTp3', {expiresIn: '3h'});
         return {userID: user.id, token: token, tokenExpiry:3}
+    },
+    deleteEmployee: async (args) => {
+        try{
+            const employee = await Employee.findById(args.employeeID).populate('employer');
+            const user = await User.findById(employee.employer._id);
+            for( var i = 0; i < user.createdEmployees.length; i++){ 
+                if ( user.createdEmployees[i].toString() === employee._id.toString()) { 
+                    user.createdEmployees.splice(i, 1);
+                }
+            }
+            await Employee.deleteOne({_id:args.employeeID});
+            const result = await user.save();
+            return {message: "Deletion successful"};
+        }catch(err)
+        {
+            throw err;
+        }
+    },
+    specificEmployee: async (args) => {
+        try {
+            console.log(args.name);
+            const newEmployee = await Employee.findOne({name: args.name});
+            console.log({...newEmployee._doc});
+            if(!newEmployee){
+                throw new Error("User doesn't exist");
+            }
+            return {...newEmployee._doc};
+        } catch (error) {
+            throw error;
+        }
     }
 }
