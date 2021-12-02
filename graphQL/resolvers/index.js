@@ -5,25 +5,6 @@ const User = require('../../models/User');
 const jwt = require('jsonwebtoken');
 
 
-const findEmployees = employeeID => {
-    return Employee.find({_id: {$in: employeeID}}).then(employyes => {
-        return employyes.map(employye => {
-            return {...employye._doc,
-                employer: findUser.bind(this, employye.employer)}
-        })
-    }).catch(err => {
-        throw err;
-    })
-}
-
-const findUser = UserID => {
-    return User.findById(UserID).then(user => {
-        return {...user._doc, _id: user._id, createdEmployees:findEmployees.bind(this, user._doc.createdEmployees) };
-    }).catch(err => {
-        throw err;
-    })
-}
-
 module.exports = {
     employees: ()=>{
         return Employee.find().populate('employer').then(employees => {
