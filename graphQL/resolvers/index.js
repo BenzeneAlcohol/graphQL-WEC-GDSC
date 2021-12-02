@@ -89,18 +89,27 @@ module.exports = {
         const token = jwt.sign({userID: user.id, email: user.email}, 'GTNnO0OA0dWzCUdyUGuZR7x5kPWnYTp3', {expiresIn: '3h'});
         return {userID: user.id, token: token, tokenExpiry:3}
     },
-    deleteEmployee: async (args) => {
+    deleteEmployee: async (args, req) => {
         try{
+            if(!req.isAuth)
+            {
+                throw new Error('UnAuthenticated');
+            }
+            let deleted = 0;
             const employee = await Employee.findById(args.employeeID).populate('employer');
             const user = await User.findById(employee.employer._id);
-            for( var i = 0; i < user.createdEmployees.length; i++){ 
-                if ( user.createdEmployees[i].toString() === employee._id.toString()) { 
+            if(!(req.userID.toString()===employee.employer._id.toString())){
+                return ("You did not create the employee, hence you can't delete the employee");
+            }
+            for( var i = 0; i < user.createdEmployees.length; i++){
+                if ( user.createdEmployees[i].toString() === employee._id.toString()) 
+                {
                     user.createdEmployees.splice(i, 1);
+                    await Employee.deleteOne({_id:args.employeeID});
+                    const result = await user.save();
+                    return ("Deletion successful");
                 }
             }
-            await Employee.deleteOne({_id:args.employeeID});
-            const result = await user.save();
-            return {message: "Deletion successful"};
         }catch(err)
         {
             throw err;
@@ -108,15 +117,33 @@ module.exports = {
     },
     specificEmployee: async (args) => {
         try {
-            console.log(args.name);
-            const newEmployee = await Employee.findOne({name: args.name});
-            console.log({...newEmployee._doc});
-            if(!newEmployee){
-                throw new Error("User doesn't exist");
-            }
-            return {...newEmployee._doc};
+            return Employee.find(args).populate('employer').then(employees => {
+                return employees.map(employee => {
+                    return {...employee._doc, _id: employee._doc._id.toString()};
+                })
+            }).catch(err => {
+                console.log(err);
+            })
         } catch (error) {
             throw error;
+        }
+    },
+    updateEmployee: async (args, req) => {
+        try{
+            if(!req.isAuth)
+            {
+                throw new Error('UnAuthenticated');
+            }
+            const employee = await Employee.findById(args.employeeID).populate('employer');
+            const user = await User.findById(employee.employer._id);
+            if(!(req.userID.toString()===employee.employer._id.toString())){
+                return ("You did not create the employee, hence you can't Update the employee");
+            }
+            await Employee.findByIdAndUpdate(args.employeeID, args)
+            return ("Employee Updated Successfully");
+        }catch(err)
+        {
+            throw err;
         }
     }
 }

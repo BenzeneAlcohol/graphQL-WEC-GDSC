@@ -38,14 +38,15 @@ input EmployeeInput{
 
 type RootQuery {
     employees: [Employee!]!
-    specificEmployee(name: String!): Employee!
+    specificEmployee(name: String, age: String, salary: String, experience: String): [Employee!]!
     login(email: String!, password: String!): authData
 }
 
 type RootMutation {
     createEmployee(employeeInput: EmployeeInput): Employee
     createUser(userInput: UserInput): User
-    deleteEmployee(employeeID: ID!): Employee
+    deleteEmployee(employeeID: ID!): String
+    updateEmployee(name: String, age: String, salary: String, experience: String, employeeID: ID!): String
 }
 
 
