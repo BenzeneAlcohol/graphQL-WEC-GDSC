@@ -12,10 +12,10 @@ const app = express();
 app.use(isAuth);
 
 app.get('/', (req,res)=>{
-    res.send("Hello");
+    res.send("Welcome to GraphQL Project - Muthukumar");
 })
 
-app.use('/grahql', graphqlHTTP({
+app.use('/graphql', graphqlHTTP({
     schema: GQLSchema,
     rootValue: GQLResolver,
     graphiql: true
