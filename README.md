@@ -214,7 +214,7 @@ Output: `{
 
 Now, using this token as the Request Header for our next Mutation, we can try out the createEmployee, updateEmployee mutations as follows:
 
-##Example Mutations
+## Example Mutations
 Request Header, sent under the Authorization Headers:
 
 `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI2MWE5MGI4OWNkMDU2NjUwNjhmNmQ4MzEiLCJlbWFpbCI6InhkQHhkLmNvbSIsImlhdCI6MTYzODUyMzQ0NCwiZXhwIjoxNjM4NTM0MjQ0fQ.A97VXwRwg-vnL5HdSxetZoWQft9ziqx3FwI1bIPIaXY`
