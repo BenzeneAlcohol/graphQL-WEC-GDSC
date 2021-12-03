@@ -261,6 +261,11 @@ Output:
   }
 }`
 
+## Acknowledgements
+
+ - [Documentation](https://graphql.org/graphql-js/running-an-express-graphql-server/)
+ - [Academind Channel](https://www.youtube.com/playlist?list=PL55RiY5tL51rG1x02Yyj93iypUuHYXcB_) - Referred for getting an intuitive idea about graphQL
+
 
 
 
