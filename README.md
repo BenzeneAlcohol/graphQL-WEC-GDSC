@@ -7,7 +7,6 @@
 
 In this project, I have used graphQL with node.js (express framework), to create a CRUD API with Authentication.
 
-#### **Youtube Link: https://youtu.be/_nEeV0oL7uk**
 
 ## Features implemented
 
